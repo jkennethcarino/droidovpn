@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">DroidOVPN</string>
-    <string name="action_settings">Settings</string>
+    <string name="settings">Settings</string>
+    <string name="open_source_licenses">Open source licenses</string>
+    <string name="action_licenses">@string/open_source_licenses</string>
+    <string name="action_settings">@string/settings</string>
+
+    <string name="ip_address">IP Address:</string>
+    <string name="speed">Speed:</string>
+    <string name="ping">Ping:</string>
+    <string name="format_ip_address">%1$s:%2$d</string>
+    <string name="format_ping">%s ms</string>
+    <string name="ok">OK</string>
+
 </resources>
