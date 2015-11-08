@@ -6,7 +6,7 @@ TODO
 - [ ] Import profile to OpenVPN for Android app (de.blinkt.openvpn)
 - [ ] Cache recently fetched servers
 - [ ] Filter list of servers
-- [ ] Share .ovpn server profile
+- [x] Share .ovpn server profile
 - [ ] Add server to favourites
 - [ ] Settings
   - [ ] Select the desired mirror sites

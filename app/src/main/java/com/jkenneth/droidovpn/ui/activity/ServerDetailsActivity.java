@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -65,11 +66,20 @@ public class ServerDetailsActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_server_details, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
             finish();
+            return true;
+        } else if (id == R.id.action_share) {
+            OVPNUtils.shareOVPNFile(this, mServer);
             return true;
         }
 
@@ -77,11 +87,11 @@ public class ServerDetailsActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+
         Button importProfile = (Button) findViewById(R.id.btn_import);
         importProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OVPNUtils.saveConfigData(ServerDetailsActivity.this, mServer);
                 OVPNUtils.importToOpenVPN(ServerDetailsActivity.this, mServer);
             }
         });

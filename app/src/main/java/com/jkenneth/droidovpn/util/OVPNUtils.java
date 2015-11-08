@@ -28,10 +28,15 @@ public class OVPNUtils {
             "http://play.google.com/store/apps/details?id=net.openvpn.openvpn";
 
     public static void importToOpenVPN(Activity context, Server server) {
+        File file = getFile(context, server);
+        if (!file.exists()) {
+            saveConfigData(context, server);
+        }
+
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setComponent(new ComponentName(OPENVPN_PKG_NAME, OPENVPN_CLASS_NAME));
         intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setDataAndType(Uri.fromFile(getFile(context, server)), OPENVPN_MIME_TYPE);
+        intent.setDataAndType(Uri.fromFile(file), OPENVPN_MIME_TYPE);
         try {
             context.startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -54,11 +59,9 @@ public class OVPNUtils {
 
         try {
             file = getFile(context, server);
-            if (!file.exists()) {
-                outputStream = new FileOutputStream(file);
-                outputStream.write(server.ovpnConfigData.getBytes("UTF-8"));
-                outputStream.close();
-            }
+            outputStream = new FileOutputStream(file);
+            outputStream.write(server.ovpnConfigData.getBytes("UTF-8"));
+            outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,5 +90,17 @@ public class OVPNUtils {
     public static int getDrawableResource(Context context, @NonNull String resource) {
         return context.getResources()
                 .getIdentifier(resource, "drawable", context.getPackageName());
+    }
+
+    public static void shareOVPNFile(Activity context, Server server) {
+        File file = getFile(context, server);
+        if (!file.exists()) {
+            saveConfigData(context, server);
+        }
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(getFile(context, server)));
+        context.startActivity(Intent.createChooser(intent, "Share Profile using"));
     }
 }
