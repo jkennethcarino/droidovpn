@@ -6,6 +6,9 @@
     <color name="colorAccent">#4CAF50</color>
     <color name="primaryText">#212121</color>
     <color name="secondaryText">#727272</color>
-    <color name="labelText">#444444</color>
+    <color name="tertiaryText">#444444</color>
+    <color name="white">#FFFFFF</color>
+
     <color name="divider">#B6B6B6</color>
+    <color name="btn_pressed">#2D9434</color>
 </resources>

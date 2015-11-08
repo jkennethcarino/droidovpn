@@ -4,4 +4,10 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
+
+    <style name="RoundedButton">
+        <item name="android:background">@drawable/btn_rounded_corners</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

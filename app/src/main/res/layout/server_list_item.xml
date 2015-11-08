@@ -9,7 +9,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="3dp"
-        android:text="Korea Republic Of"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/primaryText" />
 
@@ -21,7 +20,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/tv_country_name"
-        android:text="TCP"
         android:textColor="@color/secondaryText" />
 
     <!-- IP Address -->
@@ -33,7 +31,7 @@
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"
         android:text="@string/ip_address"
-        android:textColor="@color/labelText" />
+        android:textColor="@color/tertiaryText" />
 
     <TextView
         android:id="@+id/tv_ip_address"
@@ -42,7 +40,6 @@
         android:layout_below="@+id/tv_country_name"
         android:layout_toEndOf="@+id/ip_address"
         android:layout_toRightOf="@+id/ip_address"
-        android:text="180.22.5.158"
         android:textColor="@color/secondaryText"
         android:textStyle="bold" />
 
@@ -55,7 +52,7 @@
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"
         android:text="@string/speed"
-        android:textColor="@color/labelText" />
+        android:textColor="@color/tertiaryText" />
 
     <TextView
         android:id="@+id/tv_speed"
@@ -64,7 +61,6 @@
         android:layout_below="@+id/tv_ip_address"
         android:layout_toEndOf="@+id/speed"
         android:layout_toRightOf="@+id/speed"
-        android:text="184.02 Mbps"
         android:textColor="@color/secondaryText"
         android:textStyle="bold" />
 
@@ -79,7 +75,7 @@
         android:layout_toLeftOf="@+id/tv_ping"
         android:layout_toStartOf="@+id/tv_ping"
         android:text="@string/ping"
-        android:textColor="@color/labelText" />
+        android:textColor="@color/tertiaryText" />
 
     <TextView
         android:id="@+id/tv_ping"
@@ -88,7 +84,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/tv_ip_address"
-        android:text="17 ms"
         android:textColor="@color/secondaryText"
         android:textStyle="bold" />
 </RelativeLayout>
