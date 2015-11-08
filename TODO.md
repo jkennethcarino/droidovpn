@@ -1,8 +1,9 @@
 TODO
 ======
 
-- [ ] Show server details
-- [ ] Import profile to OpenVPN Connect
+- [x] Show server details
+- [x] Import profile to OpenVPN Connect app (net.openvpn.openvpn)
+- [ ] Import profile to OpenVPN for Android app (de.blinkt.openvpn)
 - [ ] Cache recently fetched servers
 - [ ] Filter list of servers
 - [ ] Share .ovpn server profile

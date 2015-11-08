@@ -1,6 +1,7 @@
 package com.jkenneth.droidovpn.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -10,12 +11,12 @@ import android.widget.TextView;
 
 import com.jkenneth.droidovpn.R;
 import com.jkenneth.droidovpn.model.Server;
+import com.jkenneth.droidovpn.ui.activity.ServerDetailsActivity;
 import com.jkenneth.droidovpn.util.OVPNUtils;
 
 import java.util.List;
 
 /**
- *
  * Copyright (C) 2015  Jhon Kenneth Carino
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,7 +36,6 @@ import java.util.List;
  */
 public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ViewHolder> {
 
-    private final TypedValue mTypedValue = new TypedValue();
     private Context mContext;
     private int mBackground;
     private List<Server> mServers;
@@ -60,6 +60,7 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ViewHolder
     }
 
     public ServerAdapter(Context context, List<Server> servers) {
+        TypedValue mTypedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
         this.mContext = context;
         this.mBackground = mTypedValue.resourceId;
@@ -76,7 +77,7 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Server server = mServers.get(position);
+        final Server server = mServers.get(position);
         holder.mCountry.setText(server.countryLong);
         holder.mProtocol.setText(server.protocol.toUpperCase());
         holder.mIpAddress.setText(String.format(
@@ -89,7 +90,9 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ViewHolder
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: show server details
+                Intent intent = new Intent(mContext, ServerDetailsActivity.class);
+                intent.putExtra(ServerDetailsActivity.EXTRA_DETAILS, server);
+                mContext.startActivity(intent);
             }
         });
     }

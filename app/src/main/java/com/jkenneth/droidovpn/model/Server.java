@@ -1,9 +1,11 @@
 package com.jkenneth.droidovpn.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Jhon Kenneth Carino on 10/18/15.
  */
-public class Server {
+public class Server implements Serializable {
 
     public String hostName;
     public String ipAddress;
