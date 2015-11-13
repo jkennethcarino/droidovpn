@@ -24,5 +24,6 @@ public class Server implements Serializable {
     public String ovpnConfigData;
     public int port;
     public String protocol;
+    public boolean isStarred;
 
 }

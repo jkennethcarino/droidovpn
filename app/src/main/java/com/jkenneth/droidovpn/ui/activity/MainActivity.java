@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import com.jkenneth.droidovpn.Config;
 import com.jkenneth.droidovpn.R;
+import com.jkenneth.droidovpn.data.DBHelper;
 import com.jkenneth.droidovpn.model.Server;
 import com.jkenneth.droidovpn.ui.adapter.ServerAdapter;
 import com.jkenneth.droidovpn.ui.fragment.LicensesDialogFragment;
@@ -50,10 +51,14 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private OkHttpClient mClient = new OkHttpClient();
+
     private Call mCall;
 
     private List<Server> mServers = new ArrayList<>();
+
     private ServerAdapter mAdapter;
+
+    private DBHelper mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +75,12 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         mCall = mClient.newCall(request);
+        mDatabase = DBHelper.getInstance(this.getApplicationContext());
 
+        // display cached server list
+        setServerList();
+
+        // get updated server list
         getServerList();
     }
 
@@ -84,13 +94,21 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(mAdapter);
     }
 
+    private void setServerList() {
+        mServers.clear();
+        mServers.addAll(mDatabase.getAll());
+        mAdapter.notifyDataSetChanged();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mCall.cancel();
-
-        mClient = null;
-        mCall = null;
+        mClient.getDispatcher().getExecutorService().execute(new Runnable() {
+            @Override
+            public void run() {
+                mCall.cancel();
+            }
+        });
     }
 
     @Override
@@ -130,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     List<Server> servers = CSVParser.parse(response);
                     mServers.clear();
                     mServers.addAll(servers);
+                    mDatabase.save(servers);
 
                     mHandler.post(new Runnable() {
                         @Override
