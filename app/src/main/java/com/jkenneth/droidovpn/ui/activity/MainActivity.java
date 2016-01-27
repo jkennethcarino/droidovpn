@@ -3,6 +3,7 @@ package com.jkenneth.droidovpn.ui.activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,15 +51,22 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+
     private OkHttpClient mClient = new OkHttpClient();
 
-    private Call mCall;
-
     private List<Server> mServers = new ArrayList<>();
+
+    private Request mRequest;
+
+    private Call mCall;
 
     private ServerAdapter mAdapter;
 
     private DBHelper mDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,20 +76,31 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setupSwipeRefreshLayout();
         setupRecyclerView();
 
-        Request request = new Request.Builder()
-                .url(Config.VPN_GATE_API)
-                .build();
+        if (mRequest == null) {
+            mRequest = new Request.Builder()
+                    .url(Config.VPN_GATE_API)
+                    .build();
+        }
 
-        mCall = mClient.newCall(request);
         mDatabase = DBHelper.getInstance(this.getApplicationContext());
 
-        // display cached server list
-        setServerList();
+        loadServerList();
 
-        // get updated server list
         getServerList();
+    }
+
+    private void setupSwipeRefreshLayout() {
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getServerList();
+            }
+        });
     }
 
     private void setupRecyclerView() {
@@ -92,23 +111,29 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(itemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(mAdapter);
+
     }
 
-    private void setServerList() {
+    /** Loads the cached VPN servers */
+    private void loadServerList() {
         mServers.clear();
         mServers.addAll(mDatabase.getAll());
         mAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void cancelRequest() {
         mClient.getDispatcher().getExecutorService().execute(new Runnable() {
             @Override
             public void run() {
                 mCall.cancel();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelRequest();
     }
 
     @Override
@@ -134,12 +159,20 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /** Displays the updated list of VPN servers */
     private void getServerList() {
+        mCall = mClient.newCall(mRequest);
+
         mCall.enqueue(new Callback() {
-            Handler mHandler = new Handler(Looper.getMainLooper());
 
             @Override
             public void onFailure(Request request, IOException e) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                });
             }
 
             @Override
@@ -154,6 +187,11 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mAdapter.notifyDataSetChanged();
+                            mSwipeRefreshLayout.setRefreshing(false);
+
+                            if (mServers.isEmpty()) {
+
+                            }
                         }
                     });
                 }

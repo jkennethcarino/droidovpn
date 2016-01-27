@@ -46,7 +46,7 @@ public final class ServerContract {
         public static final String COLUMN_NAME_IS_STARRED = "is_starred";
 
         public static final String[] ALL_COLUMNS = {
-                ServerEntry._ID,
+                _ID,
                 COLUMN_NAME_HOST_NAME,
                 COLUMN_NAME_IP_ADDRESS,
                 COLUMN_NAME_SCORE,
