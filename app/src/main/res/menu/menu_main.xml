@@ -1,14 +1,36 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.activity.MainActivity">
-    <item android:id="@+id/action_licenses"
-        android:title="@string/action_licenses"
-        android:orderInCategory="100"
-        app:showAsAction="never"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_settings"
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@drawable/ic_sort"
+        android:title="@string/action_sort"
+        app:showAsAction="ifRoom|collapseActionView">
+        <menu>
+            <group android:id="@+id/group_sort" android:checkableBehavior="single">
+                <item
+                    android:id="@+id/sort_country"
+                    android:title="@string/action_sort_country" />
+                <item
+                    android:id="@+id/sort_speed"
+                    android:title="@string/action_sort_speed" />
+                <item
+                    android:id="@+id/sort_ping"
+                    android:title="@string/action_sort_ping" />
+            </group>
+
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/action_licenses"
+        android:orderInCategory="1"
+        android:title="@string/action_licenses"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="2"
         android:title="@string/action_settings"
-        android:orderInCategory="200"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>

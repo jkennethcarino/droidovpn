@@ -5,7 +5,7 @@ TODO
 - [x] Import profile to OpenVPN Connect app (net.openvpn.openvpn)
 - [ ] Import profile to OpenVPN for Android app (de.blinkt.openvpn)
 - [x] Cache recently fetched servers
-- [ ] Filter list of servers
+- [x] Sort the list of servers
 - [x] Share .ovpn server profile
 - [ ] Add server to favourites
 - [ ] Settings

@@ -10,14 +10,14 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
+            <com.jkenneth.droidovpn.ui.widget.EmptyRecyclerView
                 android:id="@+id/recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -26,10 +26,12 @@
 
             <TextView
                 android:id="@android:id/empty"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
                 android:gravity="center"
-                android:textSize="18sp"
+                android:text="@string/empty_list"
                 android:visibility="gone" />
         </FrameLayout>
     </android.support.v4.widget.SwipeRefreshLayout>

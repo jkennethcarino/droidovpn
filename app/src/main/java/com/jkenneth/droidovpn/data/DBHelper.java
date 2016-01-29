@@ -67,31 +67,23 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.beginTransaction();
+
+        deleteOld(db);
+
         for (Server server : servers) {
             ContentValues values = getContentValues(server);
-
-            int rows = db.update(ServerEntry.TABLE_NAME, values,
-                    ServerEntry.COLUMN_NAME_IP_ADDRESS + " = ? AND " +
-                            ServerEntry.COLUMN_NAME_PROTOCOL + " = ?",
-                    new String[]{server.ipAddress, server.protocol});
-
-            if (rows != 1) {
-                // create new record
-                db.insert(ServerEntry.TABLE_NAME, null, values);
-            }
+            db.insert(ServerEntry.TABLE_NAME, null, values);
         }
         db.setTransactionSuccessful();
         db.endTransaction();
-
-        // now, delete those servers with is_old = 1
-        deleteOld();
         db.close();
     }
 
-    public void deleteOld() {
-        SQLiteDatabase db = this.getWritableDatabase();
+    /** Deletes all servers except for starred */
+    public void deleteOld(SQLiteDatabase db) {
         db.delete(ServerEntry.TABLE_NAME,
-                ServerEntry.COLUMN_NAME_IS_OLD + " = 1", null);
+                ServerEntry.COLUMN_NAME_IS_STARRED + " = 0",
+                null);
     }
 
     public void setStarred(String ipAddress, boolean isStarred) {

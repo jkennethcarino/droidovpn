@@ -5,8 +5,12 @@
     <string name="open_source_licenses">Open source licenses</string>
 
     <string name="action_licenses">@string/open_source_licenses</string>
-    <string name="action_share">Share</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_sort_country">Country</string>
+    <string name="action_sort_speed">Speed</string>
+    <string name="action_sort_ping">Ping</string>
     <string name="action_settings">@string/settings</string>
+    <string name="action_share">Share</string>
 
     <string name="ip_address">IP Address:</string>
     <string name="speed">Speed:</string>
@@ -30,4 +34,5 @@
     <string name="btn_import">Import to OpenVPN Connect</string>
 
     <string name="invalid_server">Server details is not available.</string>
+    <string name="empty_list">No servers available.</string>
 </resources>

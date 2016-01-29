@@ -18,6 +18,7 @@ import com.jkenneth.droidovpn.model.Server;
 import com.jkenneth.droidovpn.ui.adapter.ServerAdapter;
 import com.jkenneth.droidovpn.ui.fragment.LicensesDialogFragment;
 import com.jkenneth.droidovpn.ui.widget.DividerItemDecoration;
+import com.jkenneth.droidovpn.ui.widget.EmptyRecyclerView;
 import com.jkenneth.droidovpn.util.CSVParser;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -27,6 +28,8 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -51,6 +54,10 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private static final int SORT_COUNTRY = 1;
+    private static final int SORT_SPEED = 2;
+    private static final int SORT_PING = 3;
+
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
@@ -67,14 +74,20 @@ public class MainActivity extends AppCompatActivity {
 
     private DBHelper mDatabase;
 
+    private int mSortedBy;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mDatabase = DBHelper.getInstance(this.getApplicationContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // add all cached servers
+        mServers.addAll(mDatabase.getAll());
 
         setupSwipeRefreshLayout();
         setupRecyclerView();
@@ -85,11 +98,9 @@ public class MainActivity extends AppCompatActivity {
                     .build();
         }
 
-        mDatabase = DBHelper.getInstance(this.getApplicationContext());
-
-        loadServerList();
-
-        getServerList();
+        if (mServers.isEmpty()) {
+            fetchServers();
+        }
     }
 
     private void setupSwipeRefreshLayout() {
@@ -105,27 +116,33 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         mAdapter = new ServerAdapter(this, mServers);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        EmptyRecyclerView recyclerView = (EmptyRecyclerView) findViewById(R.id.recyclerview);
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+        recyclerView.setEmptyView(findViewById(android.R.id.empty));
+        recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(itemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(mAdapter);
-
     }
 
-    /** Loads the cached VPN servers */
-    private void loadServerList() {
-        mServers.clear();
-        mServers.addAll(mDatabase.getAll());
-        mAdapter.notifyDataSetChanged();
+    private void fetchServers() {
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+                getServerList();
+            }
+        });
     }
 
     private void cancelRequest() {
         mClient.getDispatcher().getExecutorService().execute(new Runnable() {
             @Override
             public void run() {
-                mCall.cancel();
+                if (mCall != null) {
+                    mCall.cancel();
+                }
             }
         });
     }
@@ -134,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         cancelRequest();
+        mSwipeRefreshLayout.setOnRefreshListener(null);
     }
 
     @Override
@@ -146,23 +164,60 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_licenses) {
-            LicensesDialogFragment licensesDialog = new LicensesDialogFragment();
-            licensesDialog.show(getSupportFragmentManager(), "licenses_dialog");
-            return true;
-        } else if (id == R.id.action_settings) {
-            //Intent intent = new Intent(this, SettingsActivity.class);
-            //startActivity(intent);
-            return true;
+        switch (id) {
+            case R.id.sort_country:
+                item.setChecked(item.isChecked());
+                sort(SORT_COUNTRY);
+                break;
+            case R.id.sort_speed:
+                item.setChecked(item.isChecked());
+                sort(SORT_SPEED);
+                break;
+            case R.id.sort_ping:
+                item.setChecked(item.isChecked());
+                sort(SORT_PING);
+                break;
+            case R.id.action_licenses:
+                LicensesDialogFragment licensesDialog = new LicensesDialogFragment();
+                licensesDialog.show(getSupportFragmentManager(), "licenses_dialog");
+                break;
+            case R.id.action_settings:
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void sort(final int sortBy) {
+        Collections.sort(mServers, new Comparator<Server>() {
+            @Override
+            public int compare(Server server, Server server2) {
+                int compareTo = 0;
+                if (sortBy == SORT_COUNTRY) {
+                    compareTo = server.countryLong.compareTo(server2.countryLong);
+
+                } else if (sortBy == SORT_SPEED) {
+                    compareTo = Long.valueOf(server2.speed)
+                            .compareTo(server.speed);
+
+                } else if (sortBy == SORT_PING) {
+                    Long ping = !server.ping.equals("-") ?
+                            Long.valueOf(server.ping) : 0L;
+                    Long ping2 = !server2.ping.equals("-") ?
+                            Long.valueOf(server2.ping) : 0L;
+
+                    compareTo = ping2.compareTo(ping);
+                }
+                return compareTo;
+            }
+        });
+        mAdapter.notifyDataSetChanged();
+        mSortedBy = sortBy;
+    }
+
     /** Displays the updated list of VPN servers */
     private void getServerList() {
         mCall = mClient.newCall(mRequest);
-
         mCall.enqueue(new Callback() {
 
             @Override
@@ -178,20 +233,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    List<Server> servers = CSVParser.parse(response);
-                    mServers.clear();
-                    mServers.addAll(servers);
-                    mDatabase.save(servers);
-
+                    final List<Server> servers = CSVParser.parse(response);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mAdapter.notifyDataSetChanged();
+                            mServers.clear();
+                            mServers.addAll(servers);
+                            mDatabase.save(servers);
+
+                            sort(mSortedBy);
+
                             mSwipeRefreshLayout.setRefreshing(false);
-
-                            if (mServers.isEmpty()) {
-
-                            }
                         }
                     });
                 }
