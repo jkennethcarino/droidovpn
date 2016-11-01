@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +18,6 @@ import com.jkenneth.droidovpn.data.DbHelper;
 import com.jkenneth.droidovpn.model.Server;
 import com.jkenneth.droidovpn.ui.adapter.ServerAdapter;
 import com.jkenneth.droidovpn.ui.fragment.LicensesDialogFragment;
-import com.jkenneth.droidovpn.ui.widget.DividerItemDecoration;
 import com.jkenneth.droidovpn.ui.widget.EmptyRecyclerView;
 import com.jkenneth.droidovpn.util.CsvParser;
 
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new ServerAdapter(this, mServers);
         EmptyRecyclerView recyclerView = (EmptyRecyclerView) findViewById(R.id.recyclerview);
         RecyclerView.ItemDecoration itemDecoration = new
-                DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+                DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         recyclerView.setEmptyView(findViewById(android.R.id.empty));
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(itemDecoration);
