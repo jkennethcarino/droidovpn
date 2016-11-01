@@ -3,7 +3,6 @@ package com.jkenneth.droidovpn.util;
 import android.util.Base64;
 
 import com.jkenneth.droidovpn.model.Server;
-import com.squareup.okhttp.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +10,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Response;
 
 /**
  * Parse CSV from VPN Gate API

@@ -20,17 +20,18 @@ import com.jkenneth.droidovpn.ui.fragment.LicensesDialogFragment;
 import com.jkenneth.droidovpn.ui.widget.DividerItemDecoration;
 import com.jkenneth.droidovpn.ui.widget.EmptyRecyclerView;
 import com.jkenneth.droidovpn.util.CSVParser;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Shows the list of parsed servers from VPN Gate CSV
@@ -137,14 +138,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cancelRequest() {
-        mClient.getDispatcher().getExecutorService().execute(new Runnable() {
-            @Override
-            public void run() {
-                if (mCall != null) {
-                    mCall.cancel();
-                }
-            }
-        });
+        if (mCall != null) {
+            mCall.cancel();
+        }
     }
 
     @Override
@@ -219,9 +215,8 @@ public class MainActivity extends AppCompatActivity {
     private void getServerList() {
         mCall = mClient.newCall(mRequest);
         mCall.enqueue(new Callback() {
-
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call call, IOException e) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -231,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     final List<Server> servers = CSVParser.parse(response);
                     mHandler.post(new Runnable() {
