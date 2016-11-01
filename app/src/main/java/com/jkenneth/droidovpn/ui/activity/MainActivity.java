@@ -177,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
                 LicensesDialogFragment licensesDialog = new LicensesDialogFragment();
                 licensesDialog.show(getSupportFragmentManager(), "licenses_dialog");
                 break;
-            case R.id.action_settings:
-                break;
+            // case R.id.action_settings:
+            //    break;
         }
 
         return super.onOptionsItemSelected(item);

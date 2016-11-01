@@ -28,9 +28,9 @@
         android:title="@string/action_licenses"
         app:showAsAction="never" />
 
-    <item
+    <!--<item
         android:id="@+id/action_settings"
         android:orderInCategory="2"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
 </menu>
