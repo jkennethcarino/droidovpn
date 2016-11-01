@@ -20,12 +20,12 @@ import com.jkenneth.droidovpn.data.ServerContract.ServerEntry;
  *
  * Created by Jhon Kenneth Carino on 11/9/2015.
  */
-public class ServerDatabase {
+class ServerDatabase {
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
-    public static final String SQL_CREATE_SERVER =
+    static final String SQL_CREATE_SERVER =
             "CREATE TABLE " + ServerEntry.TABLE_NAME + " (" +
             ServerEntry._ID + " INTEGER PRIMARY KEY," +
             ServerEntry.COLUMN_NAME_HOST_NAME + TEXT_TYPE + COMMA_SEP +
@@ -49,6 +49,5 @@ public class ServerDatabase {
             ServerEntry.COLUMN_NAME_IS_STARRED + INTEGER_TYPE +
             " )";
 
-    public static final String SQL_DELETE_SERVER =
-            "DROP TABLE IF EXISTS " + ServerEntry.TABLE_NAME;
+    static final String SQL_DELETE_SERVER = "DROP TABLE IF EXISTS " + ServerEntry.TABLE_NAME;
 }

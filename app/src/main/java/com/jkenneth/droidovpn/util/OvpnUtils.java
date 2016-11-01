@@ -17,7 +17,7 @@ import java.io.FileOutputStream;
 /**
  * Created by Jhon Kenneth Carino on 10/18/15.
  */
-public class OVPNUtils {
+public class OvpnUtils {
 
     public static final String FILE_EXTENSION = ".ovpn";
     public static final String OPENVPN_PKG_NAME = "net.openvpn.openvpn";

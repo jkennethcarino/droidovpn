@@ -33,7 +33,7 @@ import okhttp3.Response;
  *
  * Created by Jhon Kenneth Carino on 10/18/15.
  */
-public class CSVParser {
+public class CsvParser {
 
     private static final int HOST_NAME = 0;
     private static final int IP_ADDRESS = 1;

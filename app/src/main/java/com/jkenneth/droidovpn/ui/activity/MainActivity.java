@@ -13,13 +13,13 @@ import android.view.MenuItem;
 
 import com.jkenneth.droidovpn.Config;
 import com.jkenneth.droidovpn.R;
-import com.jkenneth.droidovpn.data.DBHelper;
+import com.jkenneth.droidovpn.data.DbHelper;
 import com.jkenneth.droidovpn.model.Server;
 import com.jkenneth.droidovpn.ui.adapter.ServerAdapter;
 import com.jkenneth.droidovpn.ui.fragment.LicensesDialogFragment;
 import com.jkenneth.droidovpn.ui.widget.DividerItemDecoration;
 import com.jkenneth.droidovpn.ui.widget.EmptyRecyclerView;
-import com.jkenneth.droidovpn.util.CSVParser;
+import com.jkenneth.droidovpn.util.CsvParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ServerAdapter mAdapter;
 
-    private DBHelper mDatabase;
+    private DbHelper mDatabase;
 
     private int mSortedBy;
 
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mDatabase = DBHelper.getInstance(this.getApplicationContext());
+        mDatabase = DbHelper.getInstance(this.getApplicationContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    final List<Server> servers = CSVParser.parse(response);
+                    final List<Server> servers = CsvParser.parse(response);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {

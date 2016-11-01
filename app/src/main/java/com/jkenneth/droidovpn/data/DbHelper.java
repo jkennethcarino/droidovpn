@@ -30,19 +30,19 @@ import java.util.List;
  *
  * Created by Jhon Kenneth Carino on 11/11/2015.
  */
-public class DBHelper extends SQLiteOpenHelper {
+public class DbHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "droidovpn.db";
-    private static DBHelper sInstance;
+    private static DbHelper sInstance;
 
-    public DBHelper(Context context) {
+    public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    public static synchronized DBHelper getInstance(Context context) {
+    public static synchronized DbHelper getInstance(Context context) {
         if (sInstance == null) {
-            sInstance = new DBHelper(context.getApplicationContext());
+            sInstance = new DbHelper(context.getApplicationContext());
         }
         return sInstance;
     }

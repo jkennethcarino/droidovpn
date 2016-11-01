@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.jkenneth.droidovpn.R;
 import com.jkenneth.droidovpn.model.Server;
 import com.jkenneth.droidovpn.ui.activity.ServerDetailsActivity;
-import com.jkenneth.droidovpn.util.OVPNUtils;
+import com.jkenneth.droidovpn.util.OvpnUtils;
 
 import java.util.List;
 
@@ -83,7 +83,7 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ViewHolder
         holder.mIpAddress.setText(String.format(
                 mContext.getString(R.string.format_ip_address),
                 server.ipAddress, server.port));
-        holder.mSpeed.setText(OVPNUtils.humanReadableCount(server.speed, true));
+        holder.mSpeed.setText(OvpnUtils.humanReadableCount(server.speed, true));
         holder.mPing.setText(String.format(
                 mContext.getString(R.string.format_ping), server.ping));
 

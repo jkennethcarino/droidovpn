@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.jkenneth.droidovpn.R;
 import com.jkenneth.droidovpn.model.Server;
-import com.jkenneth.droidovpn.util.OVPNUtils;
+import com.jkenneth.droidovpn.util.OvpnUtils;
 
 /**
  * Shows Server Details
@@ -79,7 +79,7 @@ public class ServerDetailsActivity extends AppCompatActivity {
             finish();
             return true;
         } else if (id == R.id.action_share) {
-            OVPNUtils.shareOVPNFile(this, mServer);
+            OvpnUtils.shareOVPNFile(this, mServer);
             return true;
         }
 
@@ -92,7 +92,7 @@ public class ServerDetailsActivity extends AppCompatActivity {
         importProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OVPNUtils.importToOpenVPN(ServerDetailsActivity.this, mServer);
+                OvpnUtils.importToOpenVPN(ServerDetailsActivity.this, mServer);
             }
         });
     }
@@ -103,12 +103,12 @@ public class ServerDetailsActivity extends AppCompatActivity {
         setText(R.id.tv_ip_address, mServer.ipAddress);
         setText(R.id.tv_port, String.valueOf(mServer.port));
         setText(R.id.tv_protocol, mServer.protocol.toUpperCase());
-        setText(R.id.tv_speed, OVPNUtils.humanReadableCount(mServer.speed, true));
+        setText(R.id.tv_speed, OvpnUtils.humanReadableCount(mServer.speed, true));
         setText(R.id.tv_ping, String.format(getString(R.string.format_ping), mServer.ping));
         setText(R.id.tv_vpn_sessions, String.valueOf(mServer.vpnSessions));
         setText(R.id.tv_uptime, String.valueOf(mServer.uptime));
         setText(R.id.tv_total_users, String.valueOf(mServer.totalUsers));
-        setText(R.id.tv_total_traffic, OVPNUtils.humanReadableCount(
+        setText(R.id.tv_total_traffic, OvpnUtils.humanReadableCount(
                 Long.valueOf(mServer.totalTraffic), false));
         setText(R.id.tv_logging_policy, mServer.logType);
         setText(R.id.tv_operator_name, mServer.operator);
