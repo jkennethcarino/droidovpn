@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.jkenneth.droidovpn.model.Server;
 
@@ -40,6 +41,7 @@ public class OvpnUtils {
         try {
             context.startActivity(intent);
         } catch (ActivityNotFoundException e) {
+            Log.d("test", "");
             // TODO: show install OpenVPN dialog
         }
     }

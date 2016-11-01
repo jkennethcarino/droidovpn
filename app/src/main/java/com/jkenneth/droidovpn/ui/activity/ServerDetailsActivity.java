@@ -1,6 +1,10 @@
 package com.jkenneth.droidovpn.ui.activity;
 
+import android.Manifest;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -14,6 +18,12 @@ import android.widget.Toast;
 import com.jkenneth.droidovpn.R;
 import com.jkenneth.droidovpn.model.Server;
 import com.jkenneth.droidovpn.util.OvpnUtils;
+
+import java.util.List;
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * Shows Server Details
@@ -35,10 +45,13 @@ import com.jkenneth.droidovpn.util.OvpnUtils;
  *
  * Created by Jhon Kenneth Carino on 10/26/2015.
  */
-public class ServerDetailsActivity extends AppCompatActivity {
+public class ServerDetailsActivity extends AppCompatActivity implements
+        EasyPermissions.PermissionCallbacks {
 
     public static final String EXTRA_DETAILS = "server_details";
+    private static final int RC_WRITE_EXTERNAL_STORAGE_PERM = 123;
 
+    private CoordinatorLayout mRootView;
     private Server mServer;
 
     @Override
@@ -49,6 +62,8 @@ public class ServerDetailsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mRootView = (CoordinatorLayout) findViewById(R.id.root_view);
 
         if (getIntent() == null) {
             Toast.makeText(this.getApplicationContext(),
@@ -62,7 +77,7 @@ public class ServerDetailsActivity extends AppCompatActivity {
         mServer = (Server) extras.getSerializable(EXTRA_DETAILS);
 
         initViews();
-        updateUI();
+        updateUi();
     }
 
     @Override
@@ -87,17 +102,16 @@ public class ServerDetailsActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-
         Button importProfile = (Button) findViewById(R.id.btn_import);
         importProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OvpnUtils.importToOpenVPN(ServerDetailsActivity.this, mServer);
+                importToOpenVpn();
             }
         });
     }
 
-    private void updateUI() {
+    private void updateUi() {
         setText(R.id.tv_country_name, mServer.countryLong);
         setText(R.id.tv_host_name, mServer.hostName);
         setText(R.id.tv_ip_address, mServer.ipAddress);
@@ -118,5 +132,44 @@ public class ServerDetailsActivity extends AppCompatActivity {
     private void setText(int textView, String text) {
         text = !TextUtils.isEmpty(text) ? text : "-";
         ((TextView) findViewById(textView)).setText(text);
+    }
+
+    @AfterPermissionGranted(RC_WRITE_EXTERNAL_STORAGE_PERM)
+    private void importToOpenVpn() {
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            OvpnUtils.importToOpenVPN(ServerDetailsActivity.this, mServer);
+        } else {
+            EasyPermissions.requestPermissions(this, getString(R.string.rationale_write_external),
+                    RC_WRITE_EXTERNAL_STORAGE_PERM, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this, getString(R.string.rationale_ask_again))
+                    .setTitle(getString(R.string.title_settings_dialog))
+                    .setPositiveButton(getString(R.string.setting))
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .build()
+                    .show();
+        } else {
+            Snackbar.make(mRootView, R.string.permission_denied_message,
+                    Snackbar.LENGTH_SHORT).show();
+        }
     }
 }
