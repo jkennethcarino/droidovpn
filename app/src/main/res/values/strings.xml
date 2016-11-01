@@ -11,13 +11,18 @@
     <string name="action_sort_ping">Ping</string>
     <string name="action_settings">@string/settings</string>
     <string name="action_share">Share</string>
-    
+
+    <!-- Runtime Permissions -->
     <string name="rationale_write_external">This app needs access to your external storage to save OVPN profiles.</string>
     <string name="rationale_ask_again">This app may not work correctly without the requested permissions. Open the app settings screen to modify app permissions.</string>
     <string name="permission_denied_message">Permission denied</string>
     <string name="title_settings_dialog">Permissions Required</string>
     <string name="setting">Settings</string>
     <string name="cancel">Cancel</string>
+
+    <string name="title_import_dialog">Import failed</string>
+    <string name="message_import_dialog">This app needs OpenVPN Connect app to import OVPN profile. Do you want to install OpenVPN Connect on Google Play Store?</string>
+    <string name="install">Install</string>
 
     <string name="ip_address">IP Address:</string>
     <string name="speed">Speed:</string>

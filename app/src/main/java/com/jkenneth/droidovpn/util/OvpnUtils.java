@@ -2,14 +2,15 @@ package com.jkenneth.droidovpn.util;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.v7.app.AlertDialog;
 
+import com.jkenneth.droidovpn.R;
 import com.jkenneth.droidovpn.model.Server;
 
 import java.io.File;
@@ -20,29 +21,47 @@ import java.io.FileOutputStream;
  */
 public class OvpnUtils {
 
-    public static final String FILE_EXTENSION = ".ovpn";
-    public static final String OPENVPN_PKG_NAME = "net.openvpn.openvpn";
-    public static final String OPENVPN_CLASS_NAME = "net.openvpn.openvpn.OpenVPNAttachmentReceiver";
-    public static final String OPENVPN_MIME_TYPE = "application/x-openvpn-profile";
-    public static final String OPENVPN_MARKET_URI = "market://details?id=net.openvpn.openvpn";
-    public static final String OPENVPN_PLAYSTORE_URL =
-            "http://play.google.com/store/apps/details?id=net.openvpn.openvpn";
+    private static final String FILE_EXTENSION = ".ovpn";
+    private static final String OPENVPN_PKG_NAME = "net.openvpn.openvpn";
+    private static final String OPENVPN_MIME_TYPE = "application/x-openvpn-profile";
 
-    public static void importToOpenVPN(Activity context, Server server) {
-        File file = getFile(context, server);
+    /**
+     * Imports OVPN configuration into OpenVPN Connect app (net.openvpn.openvpn), if available.
+     * Otherwise, this opens Google Play Store to install OpenVPN Connect app.
+     *
+     * @param activity The context of an activity
+     * @param server The {@link Server} that contains OVPN profile you want to import.
+     */
+    public static void importToOpenVpn(@NonNull final Activity activity, @NonNull Server server) {
+        File file = getFile(activity, server);
         if (!file.exists()) {
-            saveConfigData(context, server);
+            saveConfigData(activity, server);
         }
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setComponent(new ComponentName(OPENVPN_PKG_NAME, OPENVPN_CLASS_NAME));
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         intent.setDataAndType(Uri.fromFile(file), OPENVPN_MIME_TYPE);
         try {
-            context.startActivity(intent);
+            activity.startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            Log.d("test", "");
-            // TODO: show install OpenVPN dialog
+            AlertDialog dialog = new AlertDialog.Builder(activity)
+                    .setTitle(R.string.title_import_dialog)
+                    .setMessage(R.string.message_import_dialog)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            PlayStoreUtils.openApp(activity, OPENVPN_PKG_NAME);
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    })
+                    .create();
+            dialog.show();
         }
     }
 
@@ -55,7 +74,13 @@ public class OvpnUtils {
                 bytes / Math.pow(unit, exp), pre);
     }
 
-    public static void saveConfigData(Context context, Server server) {
+    /**
+     * Writes and saves OVPN profile to a file
+     *
+     * @param context The context of an application
+     * @param server The {@link Server} that contains OVPN profile
+     */
+    private static void saveConfigData(@NonNull Context context, @NonNull Server server) {
         File file;
         FileOutputStream outputStream;
 
@@ -69,7 +94,13 @@ public class OvpnUtils {
         }
     }
 
-    public static File getFile(Context context, Server server) {
+    /**
+     * Creates an empty file for OVPN profile
+     *
+     * @param context The context of an application
+     * @param server The {@link Server} that contains OVPN profile
+     */
+    private static File getFile(@NonNull Context context, @NonNull Server server) {
         File filePath;
         if (!Environment.isExternalStorageRemovable() || isExternalStorageWritable()) {
             filePath = context.getExternalCacheDir();
@@ -80,8 +111,10 @@ public class OvpnUtils {
                 server.protocol.toUpperCase() + FILE_EXTENSION);
     }
 
-    /* Checks if external storage is available for read and write */
-    public static boolean isExternalStorageWritable() {
+    /**
+     * @return Whether the external storage is available for read and write.
+     */
+    private static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;
@@ -89,20 +122,26 @@ public class OvpnUtils {
         return false;
     }
 
-    public static int getDrawableResource(Context context, @NonNull String resource) {
+    public static int getDrawableResource(@NonNull Context context, @NonNull String resource) {
         return context.getResources()
                 .getIdentifier(resource, "drawable", context.getPackageName());
     }
 
-    public static void shareOVPNFile(Activity context, Server server) {
-        File file = getFile(context, server);
+    /**
+     * Shows an intent chooser to share OVPN profile.
+     *
+     * @param activity The context of an activity
+     * @param server The {@link Server} that contains OVPN profile
+     */
+    public static void shareOvpnFile(@NonNull Activity activity, @NonNull Server server) {
+        File file = getFile(activity, server);
         if (!file.exists()) {
-            saveConfigData(context, server);
+            saveConfigData(activity, server);
         }
 
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("*/*");
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(getFile(context, server)));
-        context.startActivity(Intent.createChooser(intent, "Share Profile using"));
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(getFile(activity, server)));
+        activity.startActivity(Intent.createChooser(intent, "Share Profile using"));
     }
 }

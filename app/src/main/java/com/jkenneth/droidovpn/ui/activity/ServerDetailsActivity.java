@@ -94,7 +94,7 @@ public class ServerDetailsActivity extends AppCompatActivity implements
             finish();
             return true;
         } else if (id == R.id.action_share) {
-            OvpnUtils.shareOVPNFile(this, mServer);
+            OvpnUtils.shareOvpnFile(this, mServer);
             return true;
         }
 
@@ -137,7 +137,7 @@ public class ServerDetailsActivity extends AppCompatActivity implements
     @AfterPermissionGranted(RC_WRITE_EXTERNAL_STORAGE_PERM)
     private void importToOpenVpn() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            OvpnUtils.importToOpenVPN(ServerDetailsActivity.this, mServer);
+            OvpnUtils.importToOpenVpn(ServerDetailsActivity.this, mServer);
         } else {
             EasyPermissions.requestPermissions(this, getString(R.string.rationale_write_external),
                     RC_WRITE_EXTERNAL_STORAGE_PERM, Manifest.permission.WRITE_EXTERNAL_STORAGE);
