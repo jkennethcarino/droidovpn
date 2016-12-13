@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 
 import com.jkenneth.droidovpn.R;
@@ -38,9 +39,12 @@ public class OvpnUtils {
             saveConfigData(activity, server);
         }
 
+        Uri uri = FileProvider.getUriForFile(activity,
+                activity.getApplicationContext().getPackageName() + ".fileprovider", file);
+
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setDataAndType(Uri.fromFile(file), OPENVPN_MIME_TYPE);
+        intent.setDataAndType(uri, OPENVPN_MIME_TYPE);
         try {
             activity.startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -116,10 +120,7 @@ public class OvpnUtils {
      */
     private static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     public static int getDrawableResource(@NonNull Context context, @NonNull String resource) {

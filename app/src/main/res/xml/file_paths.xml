@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path name="files_root" path="Android/data/com.jkenneth.droidovpn/" />
+    <external-cache-path name="external_cache_storage_root" path="." />
+    <cache-path name="cache_storage_root" path="." />
+</paths>
