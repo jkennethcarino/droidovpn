@@ -1,8 +1,6 @@
 package com.jkenneth.droidovpn.ui.activity;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -12,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.badoo.mobile.util.WeakHandler;
 import com.jkenneth.droidovpn.Config;
 import com.jkenneth.droidovpn.R;
 import com.jkenneth.droidovpn.data.DbHelper;
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private WeakHandler mHandler;
 
     private OkHttpClient mClient = new OkHttpClient();
 
@@ -82,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mHandler = new WeakHandler();
         mDatabase = DbHelper.getInstance(this.getApplicationContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -128,13 +128,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchServers() {
-        mSwipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(true);
-                getServerList();
-            }
-        });
+        mSwipeRefreshLayout.setRefreshing(true);
+        getServerList();
     }
 
     private void cancelRequest() {
