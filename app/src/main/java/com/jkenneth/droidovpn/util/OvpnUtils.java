@@ -5,6 +5,8 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -16,6 +18,7 @@ import com.jkenneth.droidovpn.model.Server;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.List;
 
 /**
  * Created by Jhon Kenneth Carino on 10/18/15.
@@ -45,6 +48,17 @@ public class OvpnUtils {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         intent.setDataAndType(uri, OPENVPN_MIME_TYPE);
+
+        List<ResolveInfo> resolvedIntentActivities = activity.getPackageManager()
+                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
+            String packageName = resolvedIntentInfo.activityInfo.packageName;
+
+            activity.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+
         try {
             activity.startActivity(intent);
         } catch (ActivityNotFoundException e) {
