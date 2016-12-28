@@ -1,8 +1,9 @@
 DroidOVPN
 ======
 
-An unofficial VPN Gate client app for Android
+An unofficial [VPN Gate](http://www.vpngate.net/en/) client app for Android.
 
+<img src="/screenshots/vpn_servers.png" width="33%" /> <img src="/screenshots/vpn_server_details.png" width="33%" />
 License
 -------
 
