@@ -16,6 +16,10 @@ allprojects {
     repositories {
         jcenter()
         maven {
+            url 'https://maven.google.com'
+            // Alternative URL is 'https://dl.google.com/dl/android/maven2/'
+        }
+        maven {
             repositories {
                 url 'https://oss.sonatype.org/content/repositories/releases/'
             }
