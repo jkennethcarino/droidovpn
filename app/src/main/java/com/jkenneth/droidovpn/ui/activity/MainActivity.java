@@ -1,6 +1,8 @@
 package com.jkenneth.droidovpn.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -11,7 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.badoo.mobile.util.WeakHandler;
-import com.jkenneth.droidovpn.Config;
+import com.jkenneth.droidovpn.BuildConfig;
 import com.jkenneth.droidovpn.R;
 import com.jkenneth.droidovpn.data.DbHelper;
 import com.jkenneth.droidovpn.model.Server;
@@ -58,91 +60,98 @@ public class MainActivity extends AppCompatActivity {
     private static final int SORT_SPEED = 2;
     private static final int SORT_PING = 3;
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private static final String DIALOG_LICENSES_TAG = "licenses-dialog";
 
-    private WeakHandler mHandler;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
-    private OkHttpClient mClient = new OkHttpClient();
+    private WeakHandler handler;
 
-    private List<Server> mServers = new ArrayList<>();
+    private OkHttpClient okHttpClient = new OkHttpClient();
 
-    private Request mRequest;
+    private List<Server> servers = new ArrayList<>();
+
+    private Request request;
 
     private Call mCall;
 
-    private ServerAdapter mAdapter;
+    private ServerAdapter adapter;
 
-    private DbHelper mDatabase;
+    private DbHelper dbHelper;
 
-    private int mSortedBy;
+    private int sortedBy;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mHandler = new WeakHandler();
-        mDatabase = DbHelper.getInstance(this.getApplicationContext());
+        handler = new WeakHandler();
+        dbHelper = DbHelper.getInstance(this.getApplicationContext());
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // Retrieve all cached servers
+        servers.addAll(dbHelper.getAll());
+
+        // Set up the toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // add all cached servers
-        mServers.addAll(mDatabase.getAll());
-
+        // Set up the other views
         setupSwipeRefreshLayout();
         setupRecyclerView();
 
-        if (mRequest == null) {
-            mRequest = new Request.Builder()
-                    .url(Config.VPN_GATE_API)
+        if (request == null) {
+            request = new Request.Builder()
+                    .url(BuildConfig.VPN_GATE_API)
                     .build();
         }
 
-        if (mServers.isEmpty()) {
-            fetchServers();
+        if (servers.isEmpty()) {
+            populateServerList();
         }
     }
 
     private void setupSwipeRefreshLayout() {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getServerList();
+                populateServerList();
             }
         });
     }
 
     private void setupRecyclerView() {
-        mAdapter = new ServerAdapter(this, mServers);
-        EmptyRecyclerView recyclerView = (EmptyRecyclerView) findViewById(R.id.recyclerview);
+        adapter = new ServerAdapter(servers, serverClickCallback);
+        EmptyRecyclerView recyclerView = findViewById(R.id.recyclerview);
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        recyclerView.setEmptyView(findViewById(android.R.id.empty));
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(itemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(mAdapter);
+        recyclerView.setEmptyView(findViewById(android.R.id.empty));
+        recyclerView.setAdapter(adapter);
     }
 
-    private void fetchServers() {
-        mSwipeRefreshLayout.setRefreshing(true);
-        getServerList();
-    }
-
-    private void cancelRequest() {
-        if (mCall != null) {
-            mCall.cancel();
-        }
-    }
+    private final ServerAdapter.ServerClickCallback serverClickCallback =
+            new ServerAdapter.ServerClickCallback() {
+                @Override
+                public void onItemClick(@NonNull Server server) {
+                    Intent intent = new Intent(MainActivity.this, ServerDetailsActivity.class);
+                    intent.putExtra(ServerDetailsActivity.EXTRA_DETAILS, server);
+                    startActivity(intent);
+                }
+            };
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cancelRequest();
-        mSwipeRefreshLayout.setOnRefreshListener(null);
+        if (mCall != null) {
+            mCall.cancel();
+            mCall = null;
+        }
+        swipeRefreshLayout.setOnRefreshListener(null);
+        swipeRefreshLayout = null;
     }
 
     @Override
@@ -170,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.action_licenses:
                 LicensesDialogFragment licensesDialog = new LicensesDialogFragment();
-                licensesDialog.show(getSupportFragmentManager(), "licenses_dialog");
+                licensesDialog.show(getSupportFragmentManager(), DIALOG_LICENSES_TAG);
                 break;
             // case R.id.action_settings:
             //    break;
@@ -180,7 +189,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sort(final int sortBy) {
-        Collections.sort(mServers, new Comparator<Server>() {
+        sortedBy = sortBy;
+
+        Collections.sort(servers, new Comparator<Server>() {
             @Override
             public int compare(Server server, Server server2) {
                 int compareTo = 0;
@@ -202,20 +213,28 @@ public class MainActivity extends AppCompatActivity {
                 return compareTo;
             }
         });
-        mAdapter.notifyDataSetChanged();
-        mSortedBy = sortBy;
+        adapter.setServerList(servers);
+    }
+
+    private void loadServerList(List<Server> serverList) {
+        adapter.setServerList(serverList);
+        dbHelper.save(servers);
+
+        sort(sortedBy);
     }
 
     /** Displays the updated list of VPN servers */
-    private void getServerList() {
-        mCall = mClient.newCall(mRequest);
+    private void populateServerList() {
+        swipeRefreshLayout.setRefreshing(true);
+
+        mCall = okHttpClient.newCall(request);
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mSwipeRefreshLayout.setRefreshing(false);
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 });
             }
@@ -224,16 +243,12 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     final List<Server> servers = CsvParser.parse(response);
-                    mHandler.post(new Runnable() {
+
+                    handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mServers.clear();
-                            mServers.addAll(servers);
-                            mDatabase.save(servers);
-
-                            sort(mSortedBy);
-
-                            mSwipeRefreshLayout.setRefreshing(false);
+                            loadServerList(servers);
+                            swipeRefreshLayout.setRefreshing(false);
                         }
                     });
                 }

@@ -12,11 +12,12 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <include layout="@layout/server_details" />
@@ -25,8 +26,9 @@
                 android:id="@+id/btn_import"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/btn_margin"
-                android:layout_marginRight="@dimen/btn_margin"
+                android:layout_marginBottom="@dimen/button_vertical_margin"
+                android:layout_marginLeft="@dimen/button_horizontal_margin"
+                android:layout_marginRight="@dimen/button_horizontal_margin"
                 android:text="@string/btn_import" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

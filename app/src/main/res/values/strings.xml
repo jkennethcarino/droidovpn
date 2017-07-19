@@ -14,28 +14,26 @@
 
     <!-- Runtime Permissions -->
     <string name="rationale_write_external">This app needs access to your external storage to save OVPN profiles.</string>
-    <string name="rationale_ask_again">This app may not work correctly without the requested permissions. Open the app settings screen to modify app permissions.</string>
     <string name="permission_denied_message">Permission denied</string>
-    <string name="title_settings_dialog">Permissions Required</string>
-    <string name="setting">Settings</string>
     <string name="cancel">Cancel</string>
 
     <string name="title_import_dialog">Import failed</string>
     <string name="message_import_dialog">This app needs OpenVPN Connect app to import OVPN profile. Do you want to install OpenVPN Connect on Google Play Store?</string>
     <string name="install">Install</string>
 
-    <string name="ip_address">IP Address:</string>
-    <string name="speed">Speed:</string>
-    <string name="ping">Ping:</string>
-    <string name="format_ip_address">%1$s:%2$d</string>
-    <string name="format_ping">%s ms</string>
+    <string name="format_ip_address">IP Address: %1$s:%2$d</string>
+    <string name="format_speed">Speed: %s</string>
+    <string name="format_ping">Ping: %s ms</string>
     <string name="ok">OK</string>
 
     <!-- Server Details -->
     <string name="country_name">Country Name:</string>
     <string name="ddns_host_name">Host Name:</string>
+    <string name="ip_address">IP Address:</string>
     <string name="port">Port:</string>
     <string name="protocol">Protocol:</string>
+    <string name="speed">Speed:</string>
+    <string name="ping">Ping:</string>
     <string name="vpn_sessions">VPN Sessions:</string>
     <string name="uptime">Uptime:</string>
     <string name="total_users">Total Users:</string>
@@ -43,7 +41,7 @@
     <string name="logging_policy">Logging Policy:</string>
     <string name="operator_name">Operator\'s Name:</string>
     <string name="operator_message">Operator\'s Message:</string>
-    <string name="btn_import">Import to OpenVPN Connect</string>
+    <string name="btn_import">Import to OpenVPN Client</string>
 
     <string name="invalid_server">Server details is not available.</string>
     <string name="empty_list">No servers available.</string>

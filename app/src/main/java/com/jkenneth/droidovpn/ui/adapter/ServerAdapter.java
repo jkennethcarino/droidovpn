@@ -1,9 +1,9 @@
 package com.jkenneth.droidovpn.ui.adapter;
 
 import android.content.Context;
-import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +11,9 @@ import android.widget.TextView;
 
 import com.jkenneth.droidovpn.R;
 import com.jkenneth.droidovpn.model.Server;
-import com.jkenneth.droidovpn.ui.activity.ServerDetailsActivity;
 import com.jkenneth.droidovpn.util.OvpnUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,65 +36,65 @@ import java.util.List;
  */
 public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ViewHolder> {
 
-    private Context mContext;
-    private int mBackground;
-    private List<Server> mServers;
+    private List<Server> servers = new ArrayList<>();
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mCountry;
-        public final TextView mProtocol;
-        public final TextView mIpAddress;
-        public final TextView mSpeed;
-        public final TextView mPing;
+    private ServerClickCallback callback;
 
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            mCountry = (TextView) view.findViewById(R.id.tv_country_name);
-            mProtocol = (TextView) view.findViewById(R.id.tv_protocol);
-            mIpAddress = (TextView) view.findViewById(R.id.tv_ip_address);
-            mSpeed = (TextView) view.findViewById(R.id.tv_speed);
-            mPing = (TextView) view.findViewById(R.id.tv_ping);
-        }
+    public ServerAdapter(List<Server> servers, @NonNull ServerClickCallback callback) {
+        this.servers.clear();
+        this.servers.addAll(servers);
+        this.callback = callback;
     }
 
-    public ServerAdapter(Context context, List<Server> servers) {
-        TypedValue mTypedValue = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
-        this.mContext = context;
-        this.mBackground = mTypedValue.resourceId;
-        this.mServers = servers;
+    public void setServerList(@NonNull final List<Server> serverList) {
+        if (servers.isEmpty()) {
+            servers.clear();
+            servers.addAll(serverList);
+            notifyItemRangeInserted(0, serverList.size());
+        } else {
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return servers.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return serverList.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    Server old = servers.get(oldItemPosition);
+                    Server server = serverList.get(newItemPosition);
+                    return old.hostName.equals(server.hostName);
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    Server old = servers.get(oldItemPosition);
+                    Server server = serverList.get(newItemPosition);
+                    return old.hostName.equals(server.hostName)
+                            && old.ipAddress.equals(server.ipAddress)
+                            && old.countryLong.equals(server.countryLong);
+                }
+            });
+            servers.clear();
+            servers.addAll(serverList);
+            result.dispatchUpdatesTo(this);
+        }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.server_list_item, parent, false);
-        view.setBackgroundResource(mBackground);
-        return new ViewHolder(view);
+        return new ViewHolder(view, callback);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Server server = mServers.get(position);
-        holder.mCountry.setText(server.countryLong);
-        holder.mProtocol.setText(server.protocol.toUpperCase());
-        holder.mIpAddress.setText(String.format(
-                mContext.getString(R.string.format_ip_address),
-                server.ipAddress, server.port));
-        holder.mSpeed.setText(OvpnUtils.humanReadableCount(server.speed, true));
-        holder.mPing.setText(String.format(
-                mContext.getString(R.string.format_ping), server.ping));
-
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(mContext, ServerDetailsActivity.class);
-                intent.putExtra(ServerDetailsActivity.EXTRA_DETAILS, server);
-                mContext.startActivity(intent);
-            }
-        });
+        holder.bind(servers.get(position));
     }
 
     @Override
@@ -104,6 +104,51 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return mServers.size();
+        return servers == null ? 0 : servers.size();
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        final View rootView;
+        final TextView countryView;
+        final TextView protocolView;
+        final TextView ipAddressView;
+        final TextView speedView;
+        final TextView pingView;
+
+        final ServerClickCallback callback;
+
+        public ViewHolder(View view, ServerClickCallback callback) {
+            super(view);
+            rootView = view;
+            countryView = view.findViewById(R.id.tv_country_name);
+            protocolView = view.findViewById(R.id.tv_protocol);
+            ipAddressView = view.findViewById(R.id.tv_ip_address);
+            speedView = view.findViewById(R.id.tv_speed);
+            pingView = view.findViewById(R.id.tv_ping);
+
+            this.callback = callback;
+        }
+
+        public void bind(@NonNull final Server server) {
+            final Context context = rootView.getContext();
+
+            countryView.setText(server.countryLong);
+            protocolView.setText(server.protocol.toUpperCase());
+            ipAddressView.setText(context.getString(R.string.format_ip_address,
+                    server.ipAddress, server.port));
+            speedView.setText(context.getString(R.string.format_speed,
+                    OvpnUtils.humanReadableCount(server.speed, true)));
+            pingView.setText(context.getString(R.string.format_ping, server.ping));
+            rootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    callback.onItemClick(server);
+                }
+            });
+        }
+    }
+
+    public interface ServerClickCallback {
+        void onItemClick(@NonNull Server server);
     }
 }

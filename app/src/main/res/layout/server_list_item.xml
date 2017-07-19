@@ -1,82 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="13dp">
+    android:layout_height="@dimen/list_item_height"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin">
 
+    <!-- Country Name -->
     <TextView
         android:id="@+id/tv_country_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/primaryText" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="@dimen/list_item_vertical_margin"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="@dimen/list_item_primary_text"
+        tools:text="Country Name" />
 
     <!-- Protocol -->
     <TextView
         android:id="@+id/tv_protocol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tv_country_name"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/tv_country_name"
-        android:textColor="@color/secondaryText" />
+        android:layout_marginBottom="@dimen/list_item_vertical_margin"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="@dimen/list_item_secondary_text"
+        tools:text="TCP" />
 
     <!-- IP Address -->
-    <TextView
-        android:id="@+id/ip_address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_country_name"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
-        android:text="@string/ip_address"
-        android:textColor="@color/tertiaryText" />
-
     <TextView
         android:id="@+id/tv_ip_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/tv_country_name"
-        android:layout_toEndOf="@+id/ip_address"
-        android:layout_toRightOf="@+id/ip_address"
-        android:textColor="@color/secondaryText"
-        android:textStyle="bold" />
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="@dimen/list_item_secondary_text"
+        tools:text="IP Address" />
 
     <!-- Speed -->
-    <TextView
-        android:id="@+id/speed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_ip_address"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
-        android:text="@string/speed"
-        android:textColor="@color/tertiaryText" />
-
     <TextView
         android:id="@+id/tv_speed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/tv_ip_address"
-        android:layout_toEndOf="@+id/speed"
-        android:layout_toRightOf="@+id/speed"
-        android:textColor="@color/secondaryText"
-        android:textStyle="bold" />
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="@dimen/list_item_secondary_text"
+        tools:text="Speed" />
 
     <!-- Ping -->
-    <TextView
-        android:id="@+id/ping"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_ip_address"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_toLeftOf="@+id/tv_ping"
-        android:layout_toStartOf="@+id/tv_ping"
-        android:text="@string/ping"
-        android:textColor="@color/tertiaryText" />
-
     <TextView
         android:id="@+id/tv_ping"
         android:layout_width="wrap_content"
@@ -84,6 +68,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/tv_ip_address"
-        android:textColor="@color/secondaryText"
-        android:textStyle="bold" />
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="@dimen/list_item_secondary_text"
+        tools:text="Ping" />
 </RelativeLayout>

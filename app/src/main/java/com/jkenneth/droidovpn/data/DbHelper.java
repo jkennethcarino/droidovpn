@@ -34,17 +34,17 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "droidovpn.db";
-    private static DbHelper sInstance;
+    private static DbHelper instance;
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     public static synchronized DbHelper getInstance(Context context) {
-        if (sInstance == null) {
-            sInstance = new DbHelper(context.getApplicationContext());
+        if (instance == null) {
+            instance = new DbHelper(context.getApplicationContext());
         }
-        return sInstance;
+        return instance;
     }
 
     @Override

@@ -1,8 +1,15 @@
 <resources>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="card_margin">10dp</dimen>
-    <dimen name="details_margin">8dp</dimen>
-    <dimen name="btn_margin">5dp</dimen>
+
+    <dimen name="list_vertical_padding">8dp</dimen>
+    <dimen name="list_item_height">88dp</dimen>
+    <dimen name="list_item_primary_text">16sp</dimen>
+    <dimen name="list_item_secondary_text">14sp</dimen>
+    <dimen name="list_item_vertical_margin">8dp</dimen>
+
+    <dimen name="card_margin">16dp</dimen>
+    <dimen name="details_item_margin">8dp</dimen>
+    <dimen name="button_horizontal_margin">16dp</dimen>
+    <dimen name="button_vertical_margin">16dp</dimen>
 </resources>

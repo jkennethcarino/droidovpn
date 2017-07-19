@@ -51,19 +51,13 @@ public class ServerDetailsActivity extends AppCompatActivity implements
     public static final String EXTRA_DETAILS = "server_details";
     private static final int RC_WRITE_EXTERNAL_STORAGE_PERM = 123;
 
-    private CoordinatorLayout mRootView;
-    private Server mServer;
+    private CoordinatorLayout rootView;
+    private Server server;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_details);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        mRootView = (CoordinatorLayout) findViewById(R.id.root_view);
 
         if (getIntent() == null) {
             Toast.makeText(this.getApplicationContext(),
@@ -73,10 +67,28 @@ public class ServerDetailsActivity extends AppCompatActivity implements
             return;
         }
 
-        Bundle extras = getIntent().getExtras();
-        mServer = (Server) extras.getSerializable(EXTRA_DETAILS);
+        // Set the root view
+        rootView = findViewById(R.id.root_view);
 
-        initViews();
+        // Set up the toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        // Set up import profile
+        Button importProfileButton = findViewById(R.id.btn_import);
+        importProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                importToOpenVpn();
+            }
+        });
+
+        Bundle extras = getIntent().getExtras();
+        server = (Server) extras.getSerializable(EXTRA_DETAILS);
+
         updateUi();
     }
 
@@ -89,44 +101,33 @@ public class ServerDetailsActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == android.R.id.home) {
             finish();
             return true;
         } else if (id == R.id.action_share) {
-            OvpnUtils.shareOvpnFile(this, mServer);
+            OvpnUtils.shareOvpnFile(this, server);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void initViews() {
-        Button importProfile = (Button) findViewById(R.id.btn_import);
-        importProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                importToOpenVpn();
-            }
-        });
-    }
-
     private void updateUi() {
-        setText(R.id.tv_country_name, mServer.countryLong);
-        setText(R.id.tv_host_name, mServer.hostName);
-        setText(R.id.tv_ip_address, mServer.ipAddress);
-        setText(R.id.tv_port, String.valueOf(mServer.port));
-        setText(R.id.tv_protocol, mServer.protocol.toUpperCase());
-        setText(R.id.tv_speed, OvpnUtils.humanReadableCount(mServer.speed, true));
-        setText(R.id.tv_ping, String.format(getString(R.string.format_ping), mServer.ping));
-        setText(R.id.tv_vpn_sessions, String.valueOf(mServer.vpnSessions));
-        setText(R.id.tv_uptime, String.valueOf(mServer.uptime));
-        setText(R.id.tv_total_users, String.valueOf(mServer.totalUsers));
+        setText(R.id.tv_country_name, server.countryLong);
+        setText(R.id.tv_host_name, server.hostName);
+        setText(R.id.tv_ip_address, server.ipAddress);
+        setText(R.id.tv_port, String.valueOf(server.port));
+        setText(R.id.tv_protocol, server.protocol.toUpperCase());
+        setText(R.id.tv_speed, OvpnUtils.humanReadableCount(server.speed, true));
+        setText(R.id.tv_ping, String.format(getString(R.string.format_ping), server.ping));
+        setText(R.id.tv_vpn_sessions, String.valueOf(server.vpnSessions));
+        setText(R.id.tv_uptime, String.valueOf(server.uptime));
+        setText(R.id.tv_total_users, String.valueOf(server.totalUsers));
         setText(R.id.tv_total_traffic, OvpnUtils.humanReadableCount(
-                Long.valueOf(mServer.totalTraffic), false));
-        setText(R.id.tv_logging_policy, mServer.logType);
-        setText(R.id.tv_operator_name, mServer.operator);
-        setText(R.id.tv_operator_message, mServer.message);
+                Long.valueOf(server.totalTraffic), false));
+        setText(R.id.tv_logging_policy, server.logType);
+        setText(R.id.tv_operator_name, server.operator);
+        setText(R.id.tv_operator_message, server.message);
     }
 
     private void setText(int textView, String text) {
@@ -137,7 +138,7 @@ public class ServerDetailsActivity extends AppCompatActivity implements
     @AfterPermissionGranted(RC_WRITE_EXTERNAL_STORAGE_PERM)
     private void importToOpenVpn() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            OvpnUtils.importToOpenVpn(ServerDetailsActivity.this, mServer);
+            OvpnUtils.importToOpenVpn(ServerDetailsActivity.this, server);
         } else {
             EasyPermissions.requestPermissions(this, getString(R.string.rationale_write_external),
                     RC_WRITE_EXTERNAL_STORAGE_PERM, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -161,14 +162,9 @@ public class ServerDetailsActivity extends AppCompatActivity implements
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            new AppSettingsDialog.Builder(this, getString(R.string.rationale_ask_again))
-                    .setTitle(getString(R.string.title_settings_dialog))
-                    .setPositiveButton(getString(R.string.setting))
-                    .setNegativeButton(getString(R.string.cancel), null)
-                    .build()
-                    .show();
+            new AppSettingsDialog.Builder(this).build().show();
         } else {
-            Snackbar.make(mRootView, R.string.permission_denied_message,
+            Snackbar.make(rootView, R.string.permission_denied_message,
                     Snackbar.LENGTH_SHORT).show();
         }
     }
