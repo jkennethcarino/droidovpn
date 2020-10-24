@@ -218,7 +218,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadServerList(List<Server> serverList) {
         adapter.setServerList(serverList);
-        dbHelper.save(servers);
+        //servers
+        dbHelper.save(serverList);
 
         sort(sortedBy);
     }
